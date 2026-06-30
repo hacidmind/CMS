@@ -1,0 +1,6 @@
+{
+  "name": "Card Management System",
+  "description": "A simulated mobile card management platform featuring secure login, instant card issuance, PIN activation, real-time balance tracking, status blocking, and transactional history filtering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
