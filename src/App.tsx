@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Transaction, User, CardDesign, CardStatus } from './types';
+import { Card, Transaction, User, CardDesign, CardStatus, CardScheme } from './types';
 import { CardWidget } from './components/CardWidget';
 import { TransactionList } from './components/TransactionList';
 import { SandboxControls } from './components/SandboxControls';
@@ -74,6 +74,7 @@ export default function App() {
   // --- Create Card Form State ---
   const [newCardLabel, setNewCardLabel] = useState('Daily Expenses');
   const [newCardDesign, setNewCardDesign] = useState<CardDesign>('black');
+  const [newCardScheme, setNewCardScheme] = useState<CardScheme>('verve');
   const [newCardHolder, setNewCardHolder] = useState('');
   const [newCardFunding, setNewCardFunding] = useState('250');
 
@@ -224,22 +225,22 @@ export default function App() {
     if (!user) return;
 
     const holder = newCardHolder.trim() || user.name;
-    const fundingAmt = parseFloat(newCardFunding) || 0;
 
     // Generate credit/debit card metadata
-    const generated = generateCardDetails(holder, newCardDesign);
+    const generated = generateCardDetails(holder, newCardDesign, newCardScheme);
     const newCardId = `card_${Date.now()}`;
 
     const newCard: Card = {
       id: newCardId,
       type: 'debit',
       design: newCardDesign,
+      scheme: newCardScheme,
       label: newCardLabel.trim() || 'Shopping Card',
       holderName: holder,
       pan: generated.pan,
       cvv: generated.cvv,
       expiryDate: generated.expiryDate,
-      balance: fundingAmt,
+      balance: 150000.00, // Starts at 150,000.00 NGN default linked account balance
       pin: null, // Critical: new cards start with NO PIN
       status: 'inactive', // Critical: brand new card is inactive until PIN setup
       createdAt: new Date().toISOString(),
@@ -249,23 +250,8 @@ export default function App() {
     setCards(prev => [...prev, newCard]);
     setSelectedCardId(newCardId);
 
-    // Record initial funding transaction if positive
-    if (fundingAmt > 0) {
-      const fundingTx: Transaction = {
-        id: `tx_fund_${Date.now()}`,
-        cardId: newCardId,
-        merchant: 'Initial Core Funding',
-        category: 'funding',
-        amount: fundingAmt,
-        date: new Date().toISOString(),
-        status: 'approved',
-      };
-      setTransactions(prev => [fundingTx, ...prev]);
-    }
-
     // Reset Form
     setNewCardLabel('Daily Expenses');
-    setNewCardFunding('250');
     setActiveSheet('none');
 
     triggerToast('💳 Card Issued! Set your PIN below to activate it.', 'success');
@@ -1077,6 +1063,33 @@ export default function App() {
                             <span className="text-[9px] text-slate-400 block mt-0.5">Defaults to account profile owner.</span>
                           </div>
 
+                           {/* Card Scheme Selection */}
+                          <div>
+                            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1.5">Card Scheme</label>
+                            <div className="grid grid-cols-3 gap-2">
+                              {[
+                                { value: 'verve', label: 'Verve (NGN)', desc: 'Interswitch Local' },
+                                { value: 'visa', label: 'Visa', desc: 'Global Debit' },
+                                { value: 'mastercard', label: 'Mastercard', desc: 'Global Secure' },
+                              ].map((sc) => (
+                                <button
+                                  key={sc.value}
+                                  id={`btn-scheme-pick-${sc.value}`}
+                                  type="button"
+                                  onClick={() => setNewCardScheme(sc.value as CardScheme)}
+                                  className={`p-2 text-[10px] font-bold rounded-lg border flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
+                                    newCardScheme === sc.value
+                                      ? 'bg-indigo-50 border-indigo-300 text-indigo-700 ring-1 ring-indigo-300'
+                                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="font-extrabold uppercase">{sc.value}</span>
+                                  <span className="text-[8px] text-slate-400 font-normal mt-0.5">{sc.desc}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
                           {/* Design Selection Grid */}
                           <div>
                             <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1.5">Polymer Theme Design</label>
@@ -1103,24 +1116,6 @@ export default function App() {
                                 </button>
                               ))}
                             </div>
-                          </div>
-
-                          {/* Initial Funding Loader */}
-                          <div>
-                            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Initial Funding Load (from checking)</label>
-                            <div className="relative">
-                              <span className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-xs font-mono font-bold text-slate-400">₦</span>
-                              <input
-                                type="number"
-                                id="input-card-initial-fund"
-                                value={newCardFunding}
-                                onChange={(e) => setNewCardFunding(e.target.value)}
-                                min="0"
-                                max="10000"
-                                className="w-full pl-6 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
-                              />
-                            </div>
-                            <span className="text-[9px] text-slate-400 block mt-0.5">Fund card immediately to run purchase simulations.</span>
                           </div>
 
                           <button

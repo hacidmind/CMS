@@ -1,4 +1,4 @@
-import { Card, Transaction } from './types';
+import { Card, Transaction, CardScheme } from './types';
 
 export const INITIAL_USER = {
   id: 'usr_1',
@@ -16,10 +16,21 @@ export const MOCK_MERCHANTS = {
 };
 
 // Generates a random card number (PAN), CVV, and Expiration Date
-export function generateCardDetails(name: string, design: 'silver' | 'gold' | 'black' | 'green'): Omit<Card, 'id' | 'createdAt' | 'balance' | 'label' | 'pin' | 'status'> {
-  // Let's make sure it's realistic
-  const bin = '411122'; // Visa standard BIN
-  const remainingDigits = Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join('');
+export function generateCardDetails(
+  name: string, 
+  design: 'silver' | 'gold' | 'black' | 'green',
+  scheme: CardScheme
+): Omit<Card, 'id' | 'createdAt' | 'balance' | 'label' | 'pin' | 'status'> {
+  // Select realistic BIN prefixes
+  let bin = '506100'; // Verve (default)
+  if (scheme === 'visa') {
+    bin = '411122';
+  } else if (scheme === 'mastercard') {
+    bin = '522122';
+  }
+  
+  const remainingLength = 16 - bin.length;
+  const remainingDigits = Array.from({ length: remainingLength }, () => Math.floor(Math.random() * 10)).join('');
   const pan = bin + remainingDigits;
   
   const cvv = Array.from({ length: 3 }, () => Math.floor(Math.random() * 10)).join('');
@@ -33,6 +44,7 @@ export function generateCardDetails(name: string, design: 'silver' | 'gold' | 'b
   return {
     type: 'debit',
     design,
+    scheme,
     holderName: name,
     pan,
     cvv,
@@ -45,12 +57,13 @@ export const INITIAL_CARDS: Card[] = [
     id: 'card_1',
     type: 'debit',
     design: 'black',
+    scheme: 'verve',
     label: 'Primary Spending',
     holderName: 'Abiola Hafeez',
-    pan: '4111228833445566',
+    pan: '5061008833445566',
     cvv: '581',
     expiryDate: '11/30',
-    balance: 345500.00,
+    balance: 150000.00,
     pin: '1234', // Already active
     status: 'active',
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -59,9 +72,10 @@ export const INITIAL_CARDS: Card[] = [
     id: 'card_2',
     type: 'debit',
     design: 'gold',
+    scheme: 'mastercard',
     label: 'Online Shopping Card',
     holderName: 'Abiola Hafeez',
-    pan: '4111225500112233',
+    pan: '5221225500112233',
     cvv: '824',
     expiryDate: '05/31',
     balance: 45000.00,

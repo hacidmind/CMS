@@ -7,11 +7,13 @@ export interface User {
 
 export type CardStatus = 'inactive' | 'active' | 'blocked';
 export type CardDesign = 'silver' | 'gold' | 'black' | 'green';
+export type CardScheme = 'verve' | 'visa' | 'mastercard';
 
 export interface Card {
   id: string;
   type: 'debit';
   design: CardDesign;
+  scheme: CardScheme;
   label: string;
   holderName: string;
   pan: string; // e.g. "4111222233334444"

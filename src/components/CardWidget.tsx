@@ -62,14 +62,48 @@ export const CardWidget: React.FC<CardWidgetProps> = ({
             </h3>
           </div>
           
-          {/* Card Logo Circle Combo (Simulating Premium Visa) */}
+          {/* Dynamic Card Scheme Brand */}
           <div className="flex items-center space-x-1">
-            <div className="text-right mr-2">
-              <span className="font-black italic text-md tracking-wider">VISA</span>
-              <p className="text-[7px] leading-3 opacity-60 font-mono">SANDBOX</p>
-            </div>
-            <div className="w-6 h-6 rounded-full bg-red-500/80 -mr-2"></div>
-            <div className="w-6 h-6 rounded-full bg-yellow-500/80"></div>
+            {card.scheme === 'verve' && (
+              <div className="flex items-center space-x-1.5">
+                <div className="text-right">
+                  <span className="font-extrabold italic text-sm tracking-tight text-white bg-gradient-to-r from-teal-500 to-indigo-500 px-1.5 py-0.5 rounded-sm">verve</span>
+                  <p className="text-[6px] leading-none opacity-60 font-mono mt-0.5">NGN ONLY</p>
+                </div>
+                {/* Verve signature multi-circle accent */}
+                <div className="flex -space-x-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-teal-400 opacity-90"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-90"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 opacity-90"></div>
+                </div>
+              </div>
+            )}
+            
+            {card.scheme === 'mastercard' && (
+              <div className="flex items-center space-x-1">
+                <div className="text-right mr-1">
+                  <span className="font-black text-xs tracking-tight uppercase">mastercard</span>
+                  <p className="text-[6px] leading-none opacity-60 font-mono">SANDBOX</p>
+                </div>
+                <div className="flex -space-x-2">
+                  <div className="w-5 h-5 rounded-full bg-red-500 opacity-90"></div>
+                  <div className="w-5 h-5 rounded-full bg-amber-500 opacity-80"></div>
+                </div>
+              </div>
+            )}
+
+            {card.scheme === 'visa' && (
+              <div className="flex items-center space-x-1">
+                <div className="text-right mr-1">
+                  <span className="font-black italic text-sm tracking-wider">VISA</span>
+                  <p className="text-[6px] leading-none opacity-60 font-mono">SANDBOX</p>
+                </div>
+                <div className="flex -space-x-1.5">
+                  <div className="w-5 h-5 rounded-full bg-blue-600 opacity-80"></div>
+                  <div className="w-5 h-5 rounded-full bg-yellow-500 opacity-90"></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
